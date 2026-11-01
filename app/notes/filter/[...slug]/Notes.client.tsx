@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { useDebouncedCallback } from 'use-debounce';
 
@@ -8,8 +9,6 @@ import { fetchNotes } from '@/lib/api';
 
 import NoteList from '@/components/NoteList/NoteList';
 import Pagination from '@/components/Pagination/Pagination';
-import Modal from '@/components/Modal/Modal';
-import NoteForm from '@/components/NoteForm/NoteForm';
 import SearchBox from '@/components/SearchBox/SearchBox';
 
 import css from './NotesPage.module.css';
@@ -20,8 +19,6 @@ interface NotesClientProps {
 
 export default function NotesClient({ tag }: NotesClientProps) {
   const [page, setPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [inputValue, setInputValue] = useState('');
   const [search, setSearch] = useState('');
 
@@ -41,14 +38,6 @@ export default function NotesClient({ tag }: NotesClientProps) {
     placeholderData: keepPreviousData,
   });
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
@@ -58,9 +47,9 @@ export default function NotesClient({ tag }: NotesClientProps) {
           <Pagination pageCount={data.totalPages} currentPage={page} onPageChange={setPage} />
         )}
 
-        <button type="button" className={css.button} onClick={openModal}>
+        <Link href="/notes/action/create" className={css.button}>
           Create note +
-        </button>
+        </Link>
       </header>
 
       {isLoading && <p>Loading notes...</p>}
@@ -68,12 +57,6 @@ export default function NotesClient({ tag }: NotesClientProps) {
       {isError && <p>Failed to load notes.</p>}
 
       {data && data.notes.length > 0 && <NoteList notes={data.notes} />}
-
-      {isModalOpen && (
-        <Modal onClose={closeModal}>
-          <NoteForm onClose={closeModal} />
-        </Modal>
-      )}
     </div>
   );
 }
